@@ -12,8 +12,9 @@ const Index = () => {
     setBoard(fenToBoard(fen));
   }, [fen]);
   const fromPos = useRef();
+  console.log(fromPos.current);
 
-  const makeMove = (pos) => {
+  const makeMove = (pos: string) => {
     const from = fromPos.current;
     const to = pos;
     chess.move({ from, to });
