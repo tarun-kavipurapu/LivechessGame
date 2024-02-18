@@ -11,6 +11,8 @@ const initialState = {
   possibleMoves: [],
   turn: "w",
   inCheck: false,
+  isGameOver: false,
+  message: "",
 };
 // const possibleMoves = ["e2e4", "e2e3", "e2e5", "e2e6", "e2e7", "e2e8"];
 const getPositions = (possibleMoves: string[]) => {
@@ -34,9 +36,18 @@ const movesSlice = createSlice({
       state.turn = action.payload.turn;
       state.inCheck = action.payload.inCheck;
     },
+    setGameOver: (state, action) => {
+      state.turn = action.payload.turn;
+      state.isGameOver = action.payload.isGameOver;
+      state.message = action.payload.message;
+    },
   },
 });
-export const { setPossibleMoves, clearPossibleMoves, setTurnAndCheck } =
-  movesSlice.actions;
+export const {
+  setPossibleMoves,
+  clearPossibleMoves,
+  setTurnAndCheck,
+  setGameOver,
+} = movesSlice.actions;
 
 export default movesSlice.reducer;

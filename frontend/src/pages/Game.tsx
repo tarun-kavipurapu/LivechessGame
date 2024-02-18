@@ -2,21 +2,32 @@ import React, { useState, useRef, useEffect } from "react";
 import { Chess } from "chess.js";
 import { fenToBoard } from "../functions";
 import { useAppSelector, useAppDispatch } from "./../store/hooks";
+import { isGameOver } from "./../functions";
 import {
   clearPossibleMoves,
+  setGameOver,
   setPossibleMoves,
   setTurnAndCheck,
 } from "./../store/movesSlice";
 import Board from "../components/Board";
+import { useNavigate } from "react-router-dom";
 const FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 const Game = () => {
   const [fen, setFen] = useState(FEN);
   const { current: chess } = useRef(new Chess(fen));
   const [board, setBoard] = useState(fenToBoard(fen));
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setBoard(fenToBoard(fen));
+    const { GameOver, message } = isGameOver(chess);
+    if (GameOver) {
+      dispatch(
+        setGameOver({ turn: chess.turn(), isGameOver: GameOver, message })
+      );
+      navigate("/gameOver");
+    }
     dispatch(setTurnAndCheck({ turn: chess.turn(), inCheck: chess.inCheck() }));
   }, [fen, dispatch, chess]);
   const fromPos = useRef();

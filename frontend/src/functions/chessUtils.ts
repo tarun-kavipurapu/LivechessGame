@@ -55,3 +55,18 @@ export const isLightSquare = (pos: string) => {
 
   return (index + secondNumber) % 2 === 0;
 };
+
+export const isGameOver = (chess) => {
+  if (chess.isCheckmate()) {
+    return { GameOver: true, message: "Checkmate" };
+  } else if (chess.isStalemate()) {
+    return { GameOver: true, message: "Stalemate" };
+  } else if (chess.isThreefoldRepetition()) {
+    return { GameOver: true, message: "Threefold Repetition" };
+  } else if (chess.isDraw()) {
+    return { GameOver: true, message: "Draw" };
+  } else if (chess.isInsufficientMaterial()) {
+    return { GameOver: true, message: "Insufficient Material" };
+  }
+  return { GameOver: false, message: "" };
+};
