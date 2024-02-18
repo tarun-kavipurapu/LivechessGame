@@ -6,12 +6,12 @@ const Piece = ({ piece, pos, setPos }) => {
   const handleDragStart = () => {
     setPos(pos);
     setTimeout(() => {
-      element.current.style.display = "none";
+      element.current.style.opacity = "0"; // Hide the piece during drag
     }, 0);
   };
 
   const handleDragEnd = () => {
-    element.current.style.display = "block";
+    element.current.style.opacity = "1"; // Show the piece after drag
   };
 
   useEffect(() => {
@@ -24,7 +24,7 @@ const Piece = ({ piece, pos, setPos }) => {
 
   return (
     <img
-      className="piece"
+      className="w-[70%] outline-0 bg-transparent" // Set background to transparent
       src={imagePath}
       alt=""
       draggable={true}
