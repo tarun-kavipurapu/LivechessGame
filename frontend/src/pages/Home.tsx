@@ -11,9 +11,15 @@ import {
   CardFooter,
   CardTitle,
 } from "../components/ui/card";
+import { useAppDispatch } from "../store/hooks";
+import { setRoomId } from "../store/userSlice";
 
 const Home = () => {
   const roomId = nanoid();
+  const dispatch = useAppDispatch();
+
+  dispatch(setRoomId(roomId));
+
   return (
     <div className="flex h-screen flex-col items-center justify-between pb-5 pt-[13vh]">
       <Card className="rounded-lg border bg-card text-card-foreground shadow-sm w-[90vw] max-w-[400px]">

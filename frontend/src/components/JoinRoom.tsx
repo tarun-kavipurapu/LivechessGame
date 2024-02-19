@@ -40,7 +40,6 @@ export default function JoinRoom() {
 
   function onSubmit({ roomId, username }: JoinRoomForm) {
     setIsLoading(true);
-    // socket.emit("join-room", { roomId, username });
   }
 
   useEffect(() => {

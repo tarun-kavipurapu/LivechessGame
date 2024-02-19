@@ -3,6 +3,8 @@ import { Chess } from "chess.js";
 import { fenToBoard } from "../functions";
 import { useAppSelector, useAppDispatch } from "./../store/hooks";
 import { isGameOver } from "./../functions";
+import { io } from "socket.io-client";
+
 import {
   clearPossibleMoves,
   setGameOver,
@@ -18,9 +20,31 @@ const Game = () => {
   const [board, setBoard] = useState(fenToBoard(fen));
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-
+  const socket = io("http://localhost:3000");
   useEffect(() => {
     setBoard(fenToBoard(fen));
+  }, [fen]);
+  useEffect(() => {
+    socket.emit(
+      "join-room",
+      { name: "tarun", gameID: "20" },
+      ({ error, color }) => {
+        console.log({ color });
+      }
+    );
+    socket.on("welcome", ({ message, opponent }) => {
+      console.log(message);
+    });
+    socket.on("opponent-join", ({ message, player }) => {
+      console.log(message);
+    });
+    socket.on("opponent-move", ({ from, to }) => {
+      chess.move({ from, to });
+      setFen(chess.fen());
+    });
+  }, [chess]);
+
+  useEffect(() => {
     const { GameOver, message } = isGameOver(chess);
     if (GameOver) {
       dispatch(
@@ -29,7 +53,7 @@ const Game = () => {
       navigate("/gameOver");
     }
     dispatch(setTurnAndCheck({ turn: chess.turn(), inCheck: chess.inCheck() }));
-  }, [fen, dispatch, chess]);
+  }, [dispatch, chess, fen]);
   const fromPos = useRef();
 
   const makeMove = (pos: string) => {
@@ -37,7 +61,7 @@ const Game = () => {
     const to = pos;
     chess.move({ from, to });
     dispatch(clearPossibleMoves());
-
+    socket.emit("move", { from, to });
     setFen(chess.fen());
   };
 

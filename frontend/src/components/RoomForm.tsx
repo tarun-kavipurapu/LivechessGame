@@ -16,7 +16,12 @@ import { Input } from "../components/ui/input";
 import { CopyButton } from "../components/ui/CopyButton";
 import { createRoomSchema } from "../lib/validations";
 
-function RoomForm({ roomId }) {
+import { useAppSelector, useAppDispatch } from "./../store/hooks";
+import { setUsername, setRoomId } from "../store/userSlice";
+
+function RoomForm() {
+  const dispatch = useAppDispatch();
+  const roomId = useAppSelector((state) => state.user.roomId);
   // 1. Define your form.
   const form = useForm<z.infer<typeof createRoomSchema>>({
     resolver: zodResolver(createRoomSchema),
@@ -27,9 +32,7 @@ function RoomForm({ roomId }) {
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof createRoomSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    dispatch(setUsername(values.username));
   }
 
   return (

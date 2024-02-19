@@ -1,10 +1,12 @@
 // store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import movesReducer from "./movesSlice";
+import userReducer from "./userSlice";
 
 const store = configureStore({
   reducer: {
     moves: movesReducer,
+    user: userReducer,
   },
 });
 

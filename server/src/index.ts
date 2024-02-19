@@ -1,11 +1,20 @@
 import { Server as GameServer } from "socket.io";
 import { createServer } from "http";
-
+import express from "express";
+import cors from "cors";
+import { connect } from "./socket.io/game.socket";
+const app = express();
 const httpServer = createServer();
 const gameio = new GameServer(httpServer, {
   cors: {
     origin: "*",
+    methods: ["GET", "POST"],
   },
 });
-httpServer.listen(3000);
+app.use(cors());
+connect(gameio);
+
+httpServer.listen(3000, () => {
+  console.log("server is running on port 3000");
+});
 export { gameio };
