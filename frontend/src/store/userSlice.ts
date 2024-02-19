@@ -5,10 +5,9 @@ const initialState = {
   username: "",
   roomId: "",
 };
-// const possibleMoves = ["e2e4", "e2e3", "e2e5", "e2e6", "e2e7", "e2e8"];
 
 const userSlice = createSlice({
-  name: "moves",
+  name: "user",
   initialState,
   reducers: {
     setUsername: (state, action) => {

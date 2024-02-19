@@ -15,11 +15,6 @@ import { useAppDispatch } from "../store/hooks";
 import { setRoomId } from "../store/userSlice";
 
 const Home = () => {
-  const roomId = nanoid();
-  const dispatch = useAppDispatch();
-
-  dispatch(setRoomId(roomId));
-
   return (
     <div className="flex h-screen flex-col items-center justify-between pb-5 pt-[13vh]">
       <Card className="rounded-lg border bg-card text-card-foreground shadow-sm w-[90vw] max-w-[400px]">
@@ -30,7 +25,7 @@ const Home = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col space-y-4">
-          <RoomForm roomId={roomId} />
+          <RoomForm />
           <div className="flex items-center space-x-2 ">
             <Separator className="w-[150px]" />
             <span className="text-xs text-muted-foreground">OR</span>

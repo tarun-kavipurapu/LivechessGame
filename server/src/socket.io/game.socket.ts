@@ -12,6 +12,7 @@ export const connect = (gameio) => {
         return callback({ error });
       }
       socket.join(gameId);
+      console.log(player);
       callback({ color: player?.color });
 
       socket.emit("welcome", {
@@ -28,10 +29,8 @@ export const connect = (gameio) => {
           message: `White  ${white.name} goes first`,
         });
       }
-      socket.on("move", ({ from, to }) => {
-        socket.broadcast
-          .to(opponent.gameId)
-          .emit("opponent-Move", { from, to });
+      socket.on("move", ({ from, to, gameId }) => {
+        socket.broadcast.to(gameId).emit("opponent-Move", { from, to });
       });
       socket.on("disconnect", () => {
         const player = removePlayer(socket.id, gameId);

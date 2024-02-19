@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 // import { socket } from '@/lib/socket'
 // import { joinRoomSchema } from '../lib/validations/joinRoom'
@@ -25,11 +26,14 @@ import {
 } from "../components/ui/form";
 import { Input } from "../components/ui/input";
 import { joinRoomSchema } from "../lib/validations";
+import { useAppDispatch } from "../store/hooks";
+import { setRoomId, setUsername } from "../store/userSlice";
+
 type JoinRoomForm = z.infer<typeof joinRoomSchema>;
 
 export default function JoinRoom() {
   const [isLoading, setIsLoading] = useState(false);
-
+  const dispatch = useAppDispatch();
   const form = useForm<JoinRoomForm>({
     resolver: zodResolver(joinRoomSchema),
     defaultValues: {
@@ -37,16 +41,20 @@ export default function JoinRoom() {
       roomId: "",
     },
   });
+  const navigate = useNavigate();
 
   function onSubmit({ roomId, username }: JoinRoomForm) {
-    setIsLoading(true);
+    dispatch(setUsername({ username }));
+    dispatch(setRoomId({ roomId }));
+    navigate(`/game?name=${username}&id=${roomId}`, { replace: true });
+    socket.emit("join-room", { roomId, username });
   }
 
-  useEffect(() => {
-    // socket.on("room-not-found", () => {
-    //   setIsLoading(false);
-    // });
-  }, []);
+  // useEffect(() => {
+  //   // socket.on("room-not-found", ( ) => {
+  //   //   setIsLoading(false);
+  //   // });
+  // }, []);
 
   return (
     <Dialog>

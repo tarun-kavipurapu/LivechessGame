@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
+import { nanoid } from "nanoid";
 import { Button } from "../components/ui/button";
 import {
   Form,
@@ -15,13 +15,21 @@ import {
 import { Input } from "../components/ui/input";
 import { CopyButton } from "../components/ui/CopyButton";
 import { createRoomSchema } from "../lib/validations";
-
+import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "./../store/hooks";
 import { setUsername, setRoomId } from "../store/userSlice";
+import { useEffect } from "react";
 
 function RoomForm() {
   const dispatch = useAppDispatch();
+  const username = useAppSelector((state) => state.user.username);
+  const navigate = useNavigate();
+  console.log(username);
   const roomId = useAppSelector((state) => state.user.roomId);
+  useEffect(() => {
+    const roomId = nanoid();
+    dispatch(setRoomId({ roomId }));
+  }, [dispatch]);
   // 1. Define your form.
   const form = useForm<z.infer<typeof createRoomSchema>>({
     resolver: zodResolver(createRoomSchema),
@@ -32,7 +40,8 @@ function RoomForm() {
 
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof createRoomSchema>) {
-    dispatch(setUsername(values.username));
+    dispatch(setUsername({ username: values.username }));
+    navigate(`/game?name=${values.username}&id=${roomId}`, { replace: true });
   }
 
   return (

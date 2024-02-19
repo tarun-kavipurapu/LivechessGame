@@ -7,6 +7,8 @@ import { useAppSelector } from "./store/hooks";
 import GameOver from "./pages/GameOver";
 const App = () => {
   const isGameOver = useAppSelector((state) => state.moves.isGameOver);
+  const username = useAppSelector((state) => state.user.username);
+  const roomId = useAppSelector((state) => state.user.roomId);
   return (
     <div>
       <BrowserRouter>
