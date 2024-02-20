@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -7,8 +5,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { socket } from "../lib/socket";
-// import { socket } from '@/lib/socket'
-// import { joinRoomSchema } from '../lib/validations/joinRoom'
 import { Button } from "../components/ui/button";
 import {
   Dialog,
@@ -44,19 +40,23 @@ export default function JoinRoom() {
   const navigate = useNavigate();
 
   function onSubmit(values: z.infer<typeof joinRoomSchema>) {
+    setIsLoading(true);
     dispatch(setUsername({ username: values.username }));
     dispatch(setRoomId({ roomId: values.roomId }));
     socket.emit("join-room", { name: values.username, gameId: values.roomId });
+
+    // Navigate to the desired link if there is no error
     navigate(`/game/${values.roomId}`, {
       replace: true,
     });
   }
 
-  // useEffect(() => {
-  //   // socket.on("room-not-found", ( ) => {
-  //   //   setIsLoading(false);
-  //   // });
-  // }, []);
+  useEffect(() => {
+    socket.on("error", (error) => {
+      setIsLoading(false);
+      console.log(error); // Use toast here
+    });
+  });
 
   return (
     <Dialog>

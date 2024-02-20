@@ -1,58 +1,59 @@
-import { Socket } from "socket.io";
-import { addPlayer, createPlayer, game, removePlayer } from "../game";
-import { games } from "../game";
-//player1->player
-//player2->opponent
-//create-room
-//join-room
+import { addPlayer, createPlayer } from "../game";
+
 export const connectoGame = (gameio) => {
   gameio.on("connection", (socket) => {
-    // console.log("connected with ", socket.id);
-    //creating a room
-    // console.log(games);
-
     socket.on("create-room", ({ name, gameId }) => {
-      const { opponent, error, player } = createPlayer(name, socket.id, gameId);
-      console.log("GameId-create-room", gameId);
-      console.log("create-room", player);
-      if (error) {
-        socket.emit("error", {
-          message: error,
-        });
-        return;
-      }
-      socket.join(gameId);
-      // console.log("socket-rooms", socket.rooms);
-      socket.emit("welcome", {
-        message: `welcome to the game ${player?.name}`,
-        player,
-      });
+      const { player, error } = createPlayer(name, socket.id, gameId);
+      handlePlayerCreation(socket, gameId, player, error);
     });
-    //joining a room
-    socket.on("join-room", ({ name, gameId }) => {
-      const { opponent, error, player } = addPlayer(name, socket.id, gameId);
-      console.log("GameId-join-room", gameId);
-      console.log("join-room", player);
-      if (error) {
-        socket.emit("error", {
-          message: error,
-        });
-        return;
-      }
-      socket.join(gameId);
-      // console.log("socket-rooms", socket.rooms);
 
-      socket.emit("welcome", {
-        message: `welcome to the game ${player?.name}`,
-        opponent,
-      });
+    socket.on("join-room", ({ name, gameId }) => {
+      const { player, opponent, error } = addPlayer(name, socket.id, gameId);
+      handlePlayerJoining(socket, gameId, player, opponent, error);
     });
+
     socket.on("move", ({ from, to, gameId }) => {
-      console.log("move", from, to, gameId);
-      console.log(socket.rooms);
-      socket.broadcast
-        .to(gameId.toString())
-        .emit("opponent-move", { from, to });
+      handleMove(socket, gameId, from, to);
     });
+  });
+};
+
+const handlePlayerCreation = (socket, gameId, player, error) => {
+  if (error) {
+    emitError(socket, error);
+    return;
+  }
+  socket.join(gameId);
+  emitWelcomeMessage(socket, player);
+};
+
+const handlePlayerJoining = (socket, gameId, player, opponent, error) => {
+  if (error) {
+    emitError(socket, error);
+    return;
+  }
+  socket.join(gameId);
+  emitOpponentJoinedMessage(socket, opponent);
+  emitWelcomeMessage(socket, player);
+};
+
+const handleMove = (socket, gameId, from, to) => {
+  socket.broadcast.to(gameId.toString()).emit("opponent-move", { from, to });
+};
+
+const emitError = (socket, message) => {
+  socket.emit("error", { message });
+};
+
+const emitWelcomeMessage = (socket, player) => {
+  socket.emit("welcome", {
+    message: `Welcome to the game, ${player?.name}`,
+    player,
+  });
+};
+
+const emitOpponentJoinedMessage = (socket, opponent) => {
+  socket.broadcast.emit("opponent-joined", {
+    message: `${opponent?.name} has joined the game`,
   });
 };

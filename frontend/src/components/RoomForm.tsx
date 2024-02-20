@@ -1,12 +1,11 @@
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 import { Button } from "../components/ui/button";
 import {
   Form,
-  FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,20 +17,16 @@ import { createRoomSchema } from "../lib/validations";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "./../store/hooks";
 import { setUsername, setRoomId } from "../store/userSlice";
-import { useEffect } from "react";
 import { socket } from "../lib/socket";
+import { Loader2 } from "lucide-react";
 
 function RoomForm() {
   const dispatch = useAppDispatch();
   const username = useAppSelector((state) => state.user.username);
-  const navigate = useNavigate();
-  console.log(username);
   const roomId = useAppSelector((state) => state.user.roomId);
-  useEffect(() => {
-    const roomId = nanoid();
-    dispatch(setRoomId({ roomId }));
-  }, [dispatch]);
-  // 1. Define your form.
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
+
   const form = useForm<z.infer<typeof createRoomSchema>>({
     resolver: zodResolver(createRoomSchema),
     defaultValues: {
@@ -39,14 +34,23 @@ function RoomForm() {
     },
   });
 
-  // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof createRoomSchema>) {
+  useEffect(() => {
+    if (!roomId) {
+      dispatch(setRoomId({ roomId: nanoid() }));
+    }
+  }, [dispatch, roomId]);
+
+  const onSubmit = async (values: z.infer<typeof createRoomSchema>) => {
+    setIsLoading(true);
     dispatch(setUsername({ username: values.username }));
 
     socket.emit("create-room", { name: values.username, gameId: roomId });
 
-    navigate(`/game/${roomId}`, { replace: true });
-  }
+    socket.on("opponent-joined", ({ message }) => {
+      setIsLoading(false);
+      navigate(`/game/${roomId}`, { replace: true });
+    });
+  };
 
   return (
     <Form {...form}>
@@ -62,10 +66,8 @@ function RoomForm() {
               <FormLabel className="text-foreground text-lg">
                 Username
               </FormLabel>
-              <FormControl>
-                <Input placeholder="username" {...field} />
-              </FormControl>
-              <FormMessage className="text-xs " />
+              <Input placeholder="username" {...field} />
+              <FormMessage className="text-xs" />
             </FormItem>
           )}
         />
@@ -77,8 +79,17 @@ function RoomForm() {
           </div>
         </div>
         <Button type="submit" className="mt-2 w-full">
-          Create a Room
+          {isLoading ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            " Create a Room"
+          )}
         </Button>
+        {isLoading && (
+          <p className="text-center text-sm text-muted-foreground">
+            Waiting for an opponent to join...
+          </p>
+        )}
       </form>
     </Form>
   );
