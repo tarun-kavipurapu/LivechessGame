@@ -6,7 +6,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
+import { socket } from "../lib/socket";
 // import { socket } from '@/lib/socket'
 // import { joinRoomSchema } from '../lib/validations/joinRoom'
 import { Button } from "../components/ui/button";
@@ -43,11 +43,13 @@ export default function JoinRoom() {
   });
   const navigate = useNavigate();
 
-  function onSubmit({ roomId, username }: JoinRoomForm) {
-    dispatch(setUsername({ username }));
-    dispatch(setRoomId({ roomId }));
-    navigate(`/game?name=${username}&id=${roomId}`, { replace: true });
-    socket.emit("join-room", { roomId, username });
+  function onSubmit(values: z.infer<typeof joinRoomSchema>) {
+    dispatch(setUsername({ username: values.username }));
+    dispatch(setRoomId({ roomId: "20" }));
+    socket.emit("join-room", { name: values.username, gameId: "20" });
+    navigate(`/game?name=${values.username}&id=${"20"}`, {
+      replace: true,
+    });
   }
 
   // useEffect(() => {

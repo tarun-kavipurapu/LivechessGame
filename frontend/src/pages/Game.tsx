@@ -12,6 +12,7 @@ import {
 } from "./../store/movesSlice";
 import Board from "../components/Board";
 import { useNavigate } from "react-router-dom";
+import { Button } from "../components/ui/button";
 const FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 const Game = () => {
   const [fen, setFen] = useState(FEN);
@@ -26,30 +27,21 @@ const Game = () => {
     setBoard(fenToBoard(fen));
   }, [fen]);
   useEffect(() => {
-    socket.emit(
-      "join-room",
-      { name: username, gameID: roomId },
-      ({ error, color }) => {
-        if (error) {
-          navigate("/");
-        }
-        console.log({ color });
-      }
-    );
+    console.log("control-here");
+
     socket.on("welcome", ({ message, opponent }) => {
-      console.log(message);
-    });
-    socket.on("opponent-join", ({ message, player }) => {
-      console.log(message);
+      console.log(message, opponent);
     });
     socket.on("opponent-move", ({ from, to }) => {
+      console.log("opponent-move", from, to);
       chess.move({ from, to });
       setFen(chess.fen());
     });
-    socket.on("message", ({ message }) => {
+
+    socket.on("error", ({ message }) => {
       console.log({ message });
     });
-  }, [chess, socket, username, roomId]);
+  }, [chess, fen]);
 
   useEffect(() => {
     const { GameOver, message } = isGameOver(chess);
@@ -69,7 +61,7 @@ const Game = () => {
     chess.move({ from, to });
     dispatch(clearPossibleMoves());
     setFen(chess.fen());
-    socket.emit("move", { from, to, gameId: roomId });
+    socket.emit("move", { from, to, gameId: "20" });
   };
 
   const setPos = (pos) => {
@@ -77,8 +69,17 @@ const Game = () => {
     dispatch(setPossibleMoves(chess.moves({ square: pos })));
   };
 
+  const startEvent = () => {
+    socket.emit("create-room", { name: "tarun", gameId: "20" });
+  };
+  const joinEvent = () => {
+    socket.emit("join-room", { name: "arun", gameId: "20" });
+  };
+
   return (
     <div className="chess">
+      <Button onClick={startEvent}>StartTest</Button>
+      <Button onClick={joinEvent}>Join Button</Button>
       <Board cells={board} makeMove={makeMove} setPos={setPos} />
     </div>
   );

@@ -19,6 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "./../store/hooks";
 import { setUsername, setRoomId } from "../store/userSlice";
 import { useEffect } from "react";
+import { socket } from "../lib/socket";
 
 function RoomForm() {
   const dispatch = useAppDispatch();
@@ -26,10 +27,10 @@ function RoomForm() {
   const navigate = useNavigate();
   console.log(username);
   const roomId = useAppSelector((state) => state.user.roomId);
-  useEffect(() => {
-    const roomId = nanoid();
-    dispatch(setRoomId({ roomId }));
-  }, [dispatch]);
+  // useEffect(() => {
+  //   const roomId = nanoid();
+  //   dispatch(setRoomId({ roomId }));
+  // }, [dispatch]);
   // 1. Define your form.
   const form = useForm<z.infer<typeof createRoomSchema>>({
     resolver: zodResolver(createRoomSchema),
@@ -41,6 +42,9 @@ function RoomForm() {
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof createRoomSchema>) {
     dispatch(setUsername({ username: values.username }));
+
+    socket.emit("create-room", { name: values.username, gameId: "20" });
+
     navigate(`/game?name=${values.username}&id=${roomId}`, { replace: true });
   }
 

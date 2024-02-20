@@ -1,48 +1,54 @@
-import { addPlayer, game, removePlayer } from "../game";
-
+import { addPlayer, createPlayer, game, removePlayer } from "../game";
+import { games } from "../game";
 //player1->player
 //player2->opponent
-
-export const connect = (gameio) => {
+//create-room
+//join-room
+export const connectoGame = (gameio) => {
   gameio.on("connection", (socket) => {
-    console.log("connected with ", socket.id);
-    socket.on("join-room", ({ name, gameId }, callback) => {
-      const { opponent, error, player } = addPlayer(name, socket.id, gameId);
+    // console.log("connected with ", socket.id);
+    //creating a room
+    // console.log(games);
+
+    socket.on("create-room", ({ name, gameId }) => {
+      const { opponent, error, player } = createPlayer(name, socket.id, gameId);
+      // console.log("GameId-create-room", gameId);
+      console.log("create-room", opponent);
       if (error) {
-        return callback({ error });
+        socket.emit("error", {
+          message: error,
+        });
+        return;
       }
       socket.join(gameId);
-      console.log(player);
-      callback({ color: player?.color });
+      // console.log("socket-rooms", socket.rooms);
+      socket.emit("welcome", {
+        message: `welcome to the game ${player?.name}`,
+        player,
+      });
+    });
+    //joining a room
+    socket.on("join-room", ({ name, gameId }) => {
+      const { opponent, error, player } = addPlayer(name, socket.id, gameId);
+      // console.log("GameId-join-room", gameId);
+      console.log("join-room", opponent);
+      if (error) {
+        socket.emit("error", {
+          message: error,
+        });
+        return;
+      }
+      socket.join(gameId);
+      // console.log("socket-rooms", socket.rooms);
 
       socket.emit("welcome", {
         message: `welcome to the game ${player?.name}`,
         opponent,
       });
-      socket.broadcast.to(gameId).emit("opponent-join", {
-        message: `your opponent ${opponent?.name} joined the game`,
-        player,
-      });
-      if (game(gameId).length >= 2) {
-        const white = game(gameId).find((player) => player.color === "w");
-        gameio.to(gameId).emit("message", {
-          message: `White  ${white.name} goes first`,
-        });
-      }
-      socket.on("move", ({ from, to, gameId }) => {
-        socket.broadcast.to(gameId).emit("opponent-Move", { from, to });
-      });
-      socket.on("disconnect", () => {
-        const player = removePlayer(socket.id, gameId);
-        if (player) {
-          gameio.to(gameId).emit("message", {
-            message: `${player[0].name} has left the chat `,
-          });
-          socket.broadcast.to(gameId).emit("opponent-Left", {
-            message: "Your opponent ${} has left the game",
-          });
-        }
-      });
+    });
+    socket.on("move", ({ from, to, gameId }) => {
+      console.log("move", from, to, gameId);
+      socket.broadcast.to(gameId).emit("opponent-move", { from, to });
     });
   });
 };
