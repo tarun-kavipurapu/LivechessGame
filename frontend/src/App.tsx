@@ -6,15 +6,13 @@ import Header from "./components/Header";
 import { useAppSelector } from "./store/hooks";
 import GameOver from "./pages/GameOver";
 const App = () => {
-  const isGameOver = useAppSelector((state) => state.moves.isGameOver);
-  const username = useAppSelector((state) => state.user.username);
   const roomId = useAppSelector((state) => state.user.roomId);
   return (
     <div>
       <BrowserRouter>
         <Header />
         <Routes>
-          <Route path="/game" element={<Game />} />
+          <Route path="/game/:roomId" element={<Game />} />
           <Route path="/" element={<Home />} />
           <Route
             path="/gameOver"

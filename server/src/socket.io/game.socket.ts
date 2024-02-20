@@ -1,3 +1,4 @@
+import { Socket } from "socket.io";
 import { addPlayer, createPlayer, game, removePlayer } from "../game";
 import { games } from "../game";
 //player1->player
@@ -12,8 +13,8 @@ export const connectoGame = (gameio) => {
 
     socket.on("create-room", ({ name, gameId }) => {
       const { opponent, error, player } = createPlayer(name, socket.id, gameId);
-      // console.log("GameId-create-room", gameId);
-      console.log("create-room", opponent);
+      console.log("GameId-create-room", gameId);
+      console.log("create-room", player);
       if (error) {
         socket.emit("error", {
           message: error,
@@ -30,8 +31,8 @@ export const connectoGame = (gameio) => {
     //joining a room
     socket.on("join-room", ({ name, gameId }) => {
       const { opponent, error, player } = addPlayer(name, socket.id, gameId);
-      // console.log("GameId-join-room", gameId);
-      console.log("join-room", opponent);
+      console.log("GameId-join-room", gameId);
+      console.log("join-room", player);
       if (error) {
         socket.emit("error", {
           message: error,
@@ -48,7 +49,10 @@ export const connectoGame = (gameio) => {
     });
     socket.on("move", ({ from, to, gameId }) => {
       console.log("move", from, to, gameId);
-      socket.broadcast.to(gameId).emit("opponent-move", { from, to });
+      console.log(socket.rooms);
+      socket.broadcast
+        .to(gameId.toString())
+        .emit("opponent-move", { from, to });
     });
   });
 };

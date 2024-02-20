@@ -61,7 +61,7 @@ const Game = () => {
     chess.move({ from, to });
     dispatch(clearPossibleMoves());
     setFen(chess.fen());
-    socket.emit("move", { from, to, gameId: "20" });
+    socket.emit("move", { from, to, gameId: roomId });
   };
 
   const setPos = (pos) => {
@@ -69,17 +69,8 @@ const Game = () => {
     dispatch(setPossibleMoves(chess.moves({ square: pos })));
   };
 
-  const startEvent = () => {
-    socket.emit("create-room", { name: "tarun", gameId: "20" });
-  };
-  const joinEvent = () => {
-    socket.emit("join-room", { name: "arun", gameId: "20" });
-  };
-
   return (
     <div className="chess">
-      <Button onClick={startEvent}>StartTest</Button>
-      <Button onClick={joinEvent}>Join Button</Button>
       <Board cells={board} makeMove={makeMove} setPos={setPos} />
     </div>
   );

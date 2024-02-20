@@ -27,10 +27,10 @@ function RoomForm() {
   const navigate = useNavigate();
   console.log(username);
   const roomId = useAppSelector((state) => state.user.roomId);
-  // useEffect(() => {
-  //   const roomId = nanoid();
-  //   dispatch(setRoomId({ roomId }));
-  // }, [dispatch]);
+  useEffect(() => {
+    const roomId = nanoid();
+    dispatch(setRoomId({ roomId }));
+  }, [dispatch]);
   // 1. Define your form.
   const form = useForm<z.infer<typeof createRoomSchema>>({
     resolver: zodResolver(createRoomSchema),
@@ -43,9 +43,9 @@ function RoomForm() {
   function onSubmit(values: z.infer<typeof createRoomSchema>) {
     dispatch(setUsername({ username: values.username }));
 
-    socket.emit("create-room", { name: values.username, gameId: "20" });
+    socket.emit("create-room", { name: values.username, gameId: roomId });
 
-    navigate(`/game?name=${values.username}&id=${roomId}`, { replace: true });
+    navigate(`/game/${roomId}`, { replace: true });
   }
 
   return (

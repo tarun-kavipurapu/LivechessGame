@@ -45,9 +45,9 @@ export default function JoinRoom() {
 
   function onSubmit(values: z.infer<typeof joinRoomSchema>) {
     dispatch(setUsername({ username: values.username }));
-    dispatch(setRoomId({ roomId: "20" }));
-    socket.emit("join-room", { name: values.username, gameId: "20" });
-    navigate(`/game?name=${values.username}&id=${"20"}`, {
+    dispatch(setRoomId({ roomId: values.roomId }));
+    socket.emit("join-room", { name: values.username, gameId: values.roomId });
+    navigate(`/game/${values.roomId}`, {
       replace: true,
     });
   }
