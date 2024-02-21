@@ -7,8 +7,10 @@ interface BoardProps {
   setPos: (newPos: string) => void;
 }
 const Board: React.FC<BoardProps> = ({ cells, makeMove, setPos }) => {
+  // cells = cells.reverse();
+  const reversedCells = [...cells].reverse();
   return (
-    <div className="p-4 mx-auto mt-8 rounded-lg shadow-lg w-[90vh] h-[85vh] grid grid-cols-8 bg-[#deb887]">
+    <div className="p-4 mx-auto mt-8 rounded-lg shadow-lg w-[90vh] h-[85vh] grid grid-cols-8 bg-[#deb887] rotate-360">
       {cells.map((item: CellType) => (
         <Cell
           piece={item.piece}

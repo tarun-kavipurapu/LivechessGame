@@ -58,7 +58,7 @@ export const addPlayer = (name: string, playerId: string, gameId: string) => {
 
   // If the game exists and has less than 2 players, add the new player
   const opponent = existingGame[0];
-  const color = opponent.color === "b" ? "w" : "b";
+  const color = opponent?.color === "b" ? "w" : "b";
   const player = new Player(name, playerId, gameId, color);
   existingGame.push(player);
 

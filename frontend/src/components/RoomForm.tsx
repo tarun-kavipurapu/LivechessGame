@@ -16,9 +16,10 @@ import { CopyButton } from "../components/ui/CopyButton";
 import { createRoomSchema } from "../lib/validations";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "./../store/hooks";
-import { setUsername, setRoomId } from "../store/userSlice";
+import { setUsername, setRoomId, setPlayerColor } from "../store/userSlice";
 import { socket } from "../lib/socket";
 import { Loader2 } from "lucide-react";
+import { toast } from "./ui/use-toast";
 
 function RoomForm() {
   const dispatch = useAppDispatch();
@@ -40,13 +41,21 @@ function RoomForm() {
     }
   }, [dispatch, roomId]);
 
+  // useEffect(() => {
+  //   toast({
+  //     title:message
+
+  // },[message]);
+
   const onSubmit = async (values: z.infer<typeof createRoomSchema>) => {
     setIsLoading(true);
     dispatch(setUsername({ username: values.username }));
 
     socket.emit("create-room", { name: values.username, gameId: roomId });
 
-    socket.on("opponent-joined", ({ message }) => {
+    socket.on("opponent-joined", ({ message, color, name, opponent }) => {
+      console.log(opponent?.color);
+      dispatch(setPlayerColor({ playerColor: opponent?.color }));
       setIsLoading(false);
       navigate(`/game/${roomId}`, { replace: true });
     });

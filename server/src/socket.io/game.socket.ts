@@ -1,4 +1,4 @@
-import { addPlayer, createPlayer } from "../game";
+import { addPlayer, createPlayer, removePlayer, games } from "../game";
 
 export const connectoGame = (gameio) => {
   gameio.on("connection", (socket) => {
@@ -9,11 +9,14 @@ export const connectoGame = (gameio) => {
 
     socket.on("join-room", ({ name, gameId }) => {
       const { player, opponent, error } = addPlayer(name, socket.id, gameId);
-      handlePlayerJoining(socket, gameId, player, opponent, error);
+      handlePlayerJoining(socket, gameId, player, opponent, error, gameio);
     });
 
     socket.on("move", ({ from, to, gameId }) => {
       handleMove(socket, gameId, from, to);
+    });
+    socket.on("disconnect", () => {
+      handleDisconnect(socket);
     });
   });
 };
@@ -27,13 +30,21 @@ const handlePlayerCreation = (socket, gameId, player, error) => {
   emitWelcomeMessage(socket, player);
 };
 
-const handlePlayerJoining = (socket, gameId, player, opponent, error) => {
+const handlePlayerJoining = (
+  socket,
+  gameId,
+  player,
+  opponent,
+  error,
+  gameio
+) => {
   if (error) {
     emitError(socket, error);
     return;
   }
   socket.join(gameId);
-  emitOpponentJoinedMessage(socket, opponent);
+  // emitPlayerColorAndName(socket, player, gameId);
+  emitOpponentJoinedMessage(socket, opponent, player, gameId, gameio);
   emitWelcomeMessage(socket, player);
 };
 
@@ -52,8 +63,37 @@ const emitWelcomeMessage = (socket, player) => {
   });
 };
 
-const emitOpponentJoinedMessage = (socket, opponent) => {
-  socket.broadcast.emit("opponent-joined", {
+const emitOpponentJoinedMessage = (
+  socket,
+  opponent,
+  player,
+  gameId,
+  gameio
+) => {
+  gameio.to(gameId.toString()).emit("opponent-joined", {
     message: `${opponent?.name} has joined the game`,
+    color: player?.color,
+    name: player?.name,
+    opponent,
   });
+};
+
+// const emitPlayerColorAndName = (socket, player, gameId) => {
+//   console.log(player?.name, player?.color);
+//   socket.broadcast.to(gameId.toString()).emit("opponent-color-name", {
+//     name: player?.name,
+//     color: player?.color,
+//   });
+// };
+
+const handleDisconnect = (socket) => {
+  // Remove the disconnected player from all games
+  for (const gameId in games) {
+    const result = removePlayer(socket.id, gameId);
+    if (result.error) {
+      console.log(result.error);
+    } else {
+      console.log(result.message);
+    }
+  }
 };

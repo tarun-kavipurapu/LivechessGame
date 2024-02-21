@@ -12,7 +12,7 @@ const initialState = {
   turn: "w",
   inCheck: false,
   isGameOver: false,
-  message: "",
+  status: "", //gameover status
 };
 // const possibleMoves = ["e2e4", "e2e3", "e2e5", "e2e6", "e2e7", "e2e8"];
 const getPositions = (possibleMoves: string[]) => {
@@ -39,7 +39,7 @@ const movesSlice = createSlice({
     setGameOver: (state, action) => {
       state.turn = action.payload.turn;
       state.isGameOver = action.payload.isGameOver;
-      state.message = action.payload.message;
+      state.status = action.payload.status;
     },
   },
 });

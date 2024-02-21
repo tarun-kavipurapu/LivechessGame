@@ -13,6 +13,7 @@ import {
 import Board from "../components/Board";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
+import { setMessage, setOpponentMoves } from "../store/userSlice";
 const FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 const Game = () => {
   const [fen, setFen] = useState(FEN);
@@ -23,6 +24,7 @@ const Game = () => {
 
   const username = useAppSelector((state) => state.user.username);
   const roomId = useAppSelector((state) => state.user.roomId);
+  const playerColor = useAppSelector((state) => state.user.playerColor);
   useEffect(() => {
     setBoard(fenToBoard(fen));
   }, [fen]);
@@ -30,24 +32,27 @@ const Game = () => {
     console.log("control-here");
 
     socket.on("welcome", ({ message, opponent }) => {
-      console.log(message, opponent);
+      dispatch(setMessage({ message }));
     });
     socket.on("opponent-move", ({ from, to }) => {
       console.log("opponent-move", from, to);
       chess.move({ from, to });
+
       setFen(chess.fen());
+      dispatch(setMessage({ message: "Your Turn" }));
+      dispatch(setOpponentMoves({ opponentMoves: [from, to] }));
     });
 
     socket.on("error", ({ message }) => {
-      console.log({ message });
+      dispatch(setMessage({ message: message }));
     });
   }, [chess, fen]);
 
   useEffect(() => {
-    const { GameOver, message } = isGameOver(chess);
+    const { GameOver, status } = isGameOver(chess);
     if (GameOver) {
       dispatch(
-        setGameOver({ turn: chess.turn(), isGameOver: GameOver, message })
+        setGameOver({ turn: chess.turn(), isGameOver: GameOver, status })
       );
       navigate("/gameOver");
     }
@@ -58,6 +63,8 @@ const Game = () => {
   const makeMove = (pos: string) => {
     const from = fromPos.current;
     const to = pos;
+    console.log(playerColor);
+    if (chess.turn() !== playerColor) return;
     chess.move({ from, to });
     dispatch(clearPossibleMoves());
     setFen(chess.fen());
@@ -68,7 +75,7 @@ const Game = () => {
     fromPos.current = pos;
     dispatch(setPossibleMoves(chess.moves({ square: pos })));
   };
-
+  // setBoard(board.reverse());
   return (
     <div className="chess">
       <Board cells={board} makeMove={makeMove} setPos={setPos} />

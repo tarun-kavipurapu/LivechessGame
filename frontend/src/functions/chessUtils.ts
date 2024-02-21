@@ -58,15 +58,15 @@ export const isLightSquare = (pos: string) => {
 
 export const isGameOver = (chess) => {
   if (chess.isCheckmate()) {
-    return { GameOver: true, message: "Checkmate" };
+    return { GameOver: true, status: "Checkmate" };
   } else if (chess.isStalemate()) {
-    return { GameOver: true, message: "Stalemate" };
+    return { GameOver: true, status: "Stalemate" };
   } else if (chess.isThreefoldRepetition()) {
-    return { GameOver: true, message: "Threefold Repetition" };
+    return { GameOver: true, status: "Threefold Repetition" };
   } else if (chess.isDraw()) {
-    return { GameOver: true, message: "Draw" };
+    return { GameOver: true, status: "Draw" };
   } else if (chess.isInsufficientMaterial()) {
-    return { GameOver: true, message: "Insufficient Material" };
+    return { GameOver: true, status: "Insufficient Material" };
   }
-  return { GameOver: false, message: "" };
+  return { GameOver: false, status: "" };
 };

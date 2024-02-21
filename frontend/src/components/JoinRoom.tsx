@@ -22,8 +22,13 @@ import {
 } from "../components/ui/form";
 import { Input } from "../components/ui/input";
 import { joinRoomSchema } from "../lib/validations";
-import { useAppDispatch } from "../store/hooks";
-import { setRoomId, setUsername } from "../store/userSlice";
+import { useAppDispatch, useAppSelector } from "../store/hooks";
+import {
+  setOpponentName,
+  setPlayerColor,
+  setRoomId,
+  setUsername,
+} from "../store/userSlice";
 
 type JoinRoomForm = z.infer<typeof joinRoomSchema>;
 
@@ -38,6 +43,7 @@ export default function JoinRoom() {
     },
   });
   const navigate = useNavigate();
+  const roomId = useAppSelector((state) => state.user.roomId);
 
   function onSubmit(values: z.infer<typeof joinRoomSchema>) {
     setIsLoading(true);
@@ -46,17 +52,15 @@ export default function JoinRoom() {
     socket.emit("join-room", { name: values.username, gameId: values.roomId });
 
     // Navigate to the desired link if there is no error
-    navigate(`/game/${values.roomId}`, {
-      replace: true,
+    socket.on("opponent-joined", ({ message, color, name, opponent }) => {
+      console.log(color);
+      dispatch(setPlayerColor({ playerColor: color }));
+      dispatch(setOpponentName({ opponentName: opponent?.name }));
+
+      setIsLoading(false);
+      navigate(`/game/${roomId}`, { replace: true });
     });
   }
-
-  useEffect(() => {
-    socket.on("error", (error) => {
-      setIsLoading(false);
-      console.log(error); // Use toast here
-    });
-  });
 
   return (
     <Dialog>

@@ -4,6 +4,10 @@ import { RootState } from "./store";
 const initialState = {
   username: "",
   roomId: "",
+  playerColor: "",
+  opponentName: "",
+  opponentMoves: [],
+  message: "",
 };
 
 const userSlice = createSlice({
@@ -16,8 +20,31 @@ const userSlice = createSlice({
     setRoomId: (state, action) => {
       state.roomId = action.payload.roomId;
     },
+    setPlayerColor: (state, action) => {
+      state.playerColor = action.payload.playerColor;
+    },
+    setOpponentName: (state, action) => {
+      state.opponentName = action.payload.opponentName;
+    },
+    setMessage: (state, action) => {
+      state.message = action.payload.message;
+    },
+    setOpponentMoves: (state, action) => {
+      state.opponentMoves = action.payload.opponentMoves;
+    },
+    setClearOpponentMoves: (state) => {
+      state.opponentMoves = [];
+    },
   },
 });
-export const { setUsername, setRoomId } = userSlice.actions;
+export const {
+  setUsername,
+  setRoomId,
+  setClearOpponentMoves,
+  setMessage,
+  setOpponentMoves,
+  setOpponentName,
+  setPlayerColor,
+} = userSlice.actions;
 
 export default userSlice.reducer;
