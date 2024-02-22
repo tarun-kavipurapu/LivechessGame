@@ -1,6 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 
+//store username, roomId,playerColor
+
 const initialState = {
   username: "",
   roomId: "",

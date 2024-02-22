@@ -14,6 +14,7 @@ import Board from "../components/Board";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { setMessage, setOpponentMoves } from "../store/userSlice";
+import VideoCall from "../components/VideoCall";
 const FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 const Game = () => {
   const [fen, setFen] = useState(FEN);
@@ -77,8 +78,9 @@ const Game = () => {
   };
   // setBoard(board.reverse());
   return (
-    <div className="chess">
+    <div className="flex justify-between">
       <Board cells={board} makeMove={makeMove} setPos={setPos} />
+      <VideoCall />
     </div>
   );
 };

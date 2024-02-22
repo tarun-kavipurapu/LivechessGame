@@ -15,6 +15,12 @@ export const connectoGame = (gameio) => {
     socket.on("move", ({ from, to, gameId }) => {
       handleMove(socket, gameId, from, to);
     });
+    socket.on("callUser", ({ gameId, signalData }) => {
+      socket.broadcast.to(gameId).emit("hey", { signal: signalData, gameId });
+    });
+    socket.on("acceptCall", ({ gameId, signal }) => {
+      socket.broadcast.to(gameId).emit("callAccepted", signal);
+    });
     socket.on("disconnect", () => {
       handleDisconnect(socket);
     });
