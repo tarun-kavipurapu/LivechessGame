@@ -3,6 +3,9 @@
 ## Description
 LivechessGame is a multiplayer chess game with a video chatting feature.
 
+## Application Design
+![alt text](./public/design.png)
+
 ## Technologies Used
 - React.js
 - Shadcn UI
@@ -11,6 +14,7 @@ LivechessGame is a multiplayer chess game with a video chatting feature.
 - Simple Peer --[wrapper around for webRTC ]
 
 ## Features
+
 
 ### Create a Room Page
 The create a room page allows users to initiate a new chess game session. Upon accessing this page, users can set up the parameters for the game, such as the time controls, game variant, and whether to enable video chatting during the game.
